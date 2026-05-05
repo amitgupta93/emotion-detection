@@ -11,8 +11,11 @@ import cv2
 import numpy as np
 import base64
 
-# Set static folder to frontend directory
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
+# Set static folder to frontend directory correctly
+current_dir = os.path.dirname(os.path.abspath(__file__))
+frontend_dir = os.path.join(os.path.dirname(current_dir), 'frontend')
+
+app = Flask(__name__, static_folder=frontend_dir, static_url_path='')
 CORS(app)
 
 # Move model loading inside a function to avoid early crashes
