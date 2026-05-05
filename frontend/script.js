@@ -20,7 +20,7 @@ const serverStatus = document.getElementById('server-status');
 // Hosting/API Config
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://127.0.0.1:5000'
-    : window.location.origin; // Use current Vercel origin for API
+    : 'https://emotion-detection-8d39.onrender.com'; // Using stable Render Backend for AI
 
 let stream = null;
 let detectionInterval = null;
