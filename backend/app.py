@@ -10,6 +10,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 try:
+    # Try both import styles for FER
     try:
         from fer import FER
     except ImportError:
@@ -21,26 +22,17 @@ except ImportError as e:
     print(f"Error importing libraries: {e}")
     sys.exit(1)
 
-# Absolute path setup
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
+# Set static folder to frontend directory correctly for Localhost
+current_dir = os.path.dirname(os.path.abspath(__file__))
+frontend_dir = os.path.join(os.path.dirname(current_dir), 'frontend')
 
-print(f"Base Directory: {BASE_DIR}")
-print(f"Frontend Directory: {FRONTEND_DIR}")
-
-app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path='')
+app = Flask(__name__, static_folder=frontend_dir, static_url_path='')
 CORS(app)
 
-# Lazy load detector
-detector = None
-
-def get_detector():
-    global detector
-    if detector is None:
-        print("Loading AI Model...")
-        detector = FER(mtcnn=False)
-        print("AI Model Loaded!")
-    return detector
+# Initialize detector globally for stability
+print("Initializing AI Model (FER)...")
+detector = FER(mtcnn=False)
+print("AI Model Ready!")
 
 @app.route('/')
 def serve_frontend():
@@ -48,7 +40,7 @@ def serve_frontend():
 
 @app.route('/health')
 def health():
-    return jsonify({"status": "alive", "backend": "Render"})
+    return jsonify({"status": "alive", "mode": "localhost"})
 
 @app.route('/detect', methods=['POST'])
 def detect_emotion():
@@ -61,14 +53,17 @@ def detect_emotion():
         nparr = np.frombuffer(base64.b64decode(image_data), np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        det = get_detector()
-        results = det.detect_emotions(img)
+        if img is None:
+            return jsonify({'status': 'error', 'message': 'Invalid image'}), 400
+
+        # Detect emotions
+        results = detector.detect_emotions(img)
         
         if results:
             res = results[0]
             emotions = res['emotions']
             dominant_emotion = max(emotions, key=emotions.get)
-            box = res['box']
+            box = res['box'] # [x, y, w, h]
             
             return jsonify({
                 'status': 'success',
@@ -85,12 +80,12 @@ def detect_emotion():
         print(f"Detection Error: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
-# Catch-all route for other static files
+# Catch-all route for static files
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory(app.static_folder, path)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    print(f"Starting server on port {port}...")
-    app.run(host='0.0.0.0', port=port)
+    # Use 0.0.0.0 so you can access from mobile via Computer IP
+    print("Starting Localhost Server...")
+    app.run(host='0.0.0.0', port=5000, debug=True)

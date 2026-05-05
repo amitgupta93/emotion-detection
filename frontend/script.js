@@ -18,7 +18,8 @@ const statusText = document.getElementById('status-text');
 const serverStatus = document.getElementById('server-status');
 
 // Hosting/API Config
-const API_URL = window.location.origin; // Single service on Render: API is on same origin
+// Simple localhost origin for prediction stability
+const API_URL = window.location.origin; 
 
 let stream = null;
 let detectionInterval = null;
