@@ -15,8 +15,14 @@ import base64
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
 CORS(app)
 
-# Initialize detector globally
-detector = FER(mtcnn=False)
+# Move model loading inside a function to avoid early crashes
+detector = None
+
+def get_detector():
+    global detector
+    if detector is None:
+        detector = FER(mtcnn=False)
+    return detector
 
 @app.route('/')
 def serve_frontend():
@@ -42,7 +48,8 @@ def detect_emotion():
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         # Detect emotions
-        results = detector.detect_emotions(img)
+        det = get_detector()
+        results = det.detect_emotions(img)
         
         if results:
             # FER returns results in a slightly different format
