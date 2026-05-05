@@ -14,6 +14,8 @@ const clearBtn = document.getElementById('clear-history');
 const downloadBtn = document.getElementById('download-history');
 const detectionOverlay = document.getElementById('detection-overlay');
 const scannerLine = document.getElementById('scanner-line');
+const statusText = document.getElementById('status-text');
+const serverStatus = document.getElementById('server-status');
 
 // Hosting/API Config
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -163,6 +165,8 @@ async function captureAndDetect() {
             },
             body: JSON.stringify({ image: imageData }),
         });
+        
+        if (!response.ok) throw new Error('Server response not OK');
         
         const data = await response.json();
         
@@ -343,8 +347,14 @@ window.addEventListener('load', async () => {
         const data = await res.json();
         if (data.status === 'alive') {
             console.log("Backend is awake and ready!");
+            statusText.innerText = "Backend: Online";
+            serverStatus.classList.add('online');
+            serverStatus.classList.remove('offline');
         }
     } catch (err) {
-        console.error("Backend unreachable. Checking logs...");
+        console.error("Backend unreachable.");
+        statusText.innerText = "Backend: Offline";
+        serverStatus.classList.add('offline');
+        serverStatus.classList.remove('online');
     }
 });
