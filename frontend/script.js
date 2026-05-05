@@ -115,8 +115,20 @@ function addToHistory(emotion) {
 
 async function setupCamera() {
     try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const constraints = {
+            video: {
+                facingMode: 'user', // Use front camera on mobile
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }
+        };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
+        
+        // Ensure video plays on mobile
+        video.setAttribute('playsinline', true);
+        video.play();
+        
         return true;
     } catch (err) {
         console.error("Error accessing camera:", err);

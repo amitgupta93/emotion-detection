@@ -353,6 +353,33 @@ button:disabled {
     cursor: not-allowed;
 }
 
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .controls {
+        flex-wrap: wrap;
+    }
+    
+    button {
+        width: 100%; /* Buttons stack on mobile */
+        padding: 0.6rem 1rem;
+    }
+    
+    .emoji-value {
+        font-size: 2rem;
+    }
+    
+    .mood-value {
+        font-size: 1.5rem;
+    }
+}
+
 footer {
     margin-top: 3rem;
     color: var(--text-dim);
