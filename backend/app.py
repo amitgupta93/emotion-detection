@@ -24,7 +24,15 @@ def health():
 
 @app.route('/')
 def index():
-    return "Emotion AI Backend is Running!"
+    return """
+    <html>
+        <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #0f172a; color: white;">
+            <h1>Emotion AI Backend is Running!</h1>
+            <p>Frontend is hosted at:</p>
+            <a href="https://emotion-detection-black-alpha.vercel.app/" style="color: #6366f1; text-decoration: none; font-weight: bold;">Go to App</a>
+        </body>
+    </html>
+    """
 
 @app.route('/detect', methods=['POST'])
 def detect_emotion():
