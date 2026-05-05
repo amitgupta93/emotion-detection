@@ -1,7 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import warnings
 warnings.filterwarnings("ignore")
@@ -11,28 +11,24 @@ import cv2
 import numpy as np
 import base64
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Set static folder to frontend directory
+app = Flask(__name__, static_folder='../frontend', static_url_path='')
+CORS(app)
 
-# Initialize detector globally for performance
-# Use mtcnn=False for even more speed/less RAM on Render
+# Initialize detector globally
 detector = FER(mtcnn=False)
+
+@app.route('/')
+def serve_frontend():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory(app.static_folder, path)
 
 @app.route('/health')
 def health():
     return jsonify({"status": "alive"})
-
-@app.route('/')
-def index():
-    return """
-    <html>
-        <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #0f172a; color: white;">
-            <h1>Emotion AI Backend is Running!</h1>
-            <p>Frontend is hosted at:</p>
-            <a href="https://emotion-detection-black-alpha.vercel.app/" style="color: #6366f1; text-decoration: none; font-weight: bold;">Go to App</a>
-        </body>
-    </html>
-    """
 
 @app.route('/detect', methods=['POST'])
 def detect_emotion():
