@@ -16,9 +16,7 @@ const detectionOverlay = document.getElementById('detection-overlay');
 const scannerLine = document.getElementById('scanner-line');
 
 // Hosting/API Config
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://127.0.0.1:5000'
-    : 'https://emotion-detection-8d39.onrender.com'; // <--- UPDATED WITH YOUR RENDER URL
+const API_URL = window.location.origin; // Since both are on Vercel now
 
 let stream = null;
 let detectionInterval = null;
