@@ -18,7 +18,7 @@ const scannerLine = document.getElementById('scanner-line');
 // Hosting/API Config
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://127.0.0.1:5000'
-    : 'https://emotion-detection-8d39.onrender.com'; // Your stable Render URL
+    : 'https://emotion-detection-8d39.onrender.com'; // Stable Render Backend URL
 
 let stream = null;
 let detectionInterval = null;
