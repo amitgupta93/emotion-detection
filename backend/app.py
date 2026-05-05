@@ -1,19 +1,22 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import warnings
-warnings.filterwarnings("ignore") # Suppress warnings
+warnings.filterwarnings("ignore")
 
-from deepface import DeepFace
+from fer import FER
 import cv2
 import numpy as np
 import base64
-import os
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}}) # Explicitly allow all origins
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Initialize detector globally for performance
+# Use mtcnn=False for even more speed/less RAM on Render
+detector = FER(mtcnn=False)
 
 @app.route('/health')
 def health():
@@ -21,44 +24,39 @@ def health():
 
 @app.route('/')
 def index():
-    return """
-    <html>
-        <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #0f172a; color: white;">
-            <h1>Emotion AI Backend is Running</h1>
-            <p>This is the API server. To see the actual App UI, please go to:</p>
-            <a href="http://localhost:8000" style="color: #6366f1; font-size: 20px; text-decoration: none; border: 1px solid #6366f1; padding: 10px 20px; border-radius: 5px;">Open App UI (Port 8000)</a>
-        </body>
-    </html>
-    """
+    return "Emotion AI Backend is Running!"
 
 @app.route('/detect', methods=['POST'])
 def detect_emotion():
     try:
         data = request.json
+        if not data or 'image' not in data:
+            return jsonify({'status': 'error', 'message': 'No image data'}), 400
+            
         image_data = data['image'].split(',')[1]
-        
-        # Decode base64 image
         nparr = np.frombuffer(base64.b64decode(image_data), np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Save temporary image for DeepFace (it prefers file paths or numpy arrays)
-        # DeepFace.analyze can take numpy array directly
-        results = DeepFace.analyze(img, actions=['emotion'], enforce_detection=False)
+        # Detect emotions
+        results = detector.detect_emotions(img)
         
         if results:
-            # DeepFace returns a list of results (one for each face)
+            # FER returns results in a slightly different format
             res = results[0]
-            dominant_emotion = res['dominant_emotion']
-            # Convert float32 to standard float for JSON serialization
-            emotion_scores = {k: float(v) for k, v in res['emotion'].items()}
-            face_region = res['region'] # Get face coordinates
+            emotions = res['emotions']
+            dominant_emotion = max(emotions, key=emotions.get)
+            box = res['box'] # [x, y, w, h]
             
-            # DeepFace emotion keys are slightly different (e.g., 'happy', 'sad', etc.)
             return jsonify({
                 'status': 'success',
                 'emotion': dominant_emotion,
-                'scores': emotion_scores,
-                'region': face_region
+                'scores': {k: float(v) for k, v in emotions.items()},
+                'region': {
+                    'x': int(box[0]),
+                    'y': int(box[1]),
+                    'w': int(box[2]),
+                    'h': int(box[3])
+                }
             })
         else:
             return jsonify({
@@ -67,16 +65,12 @@ def detect_emotion():
             })
             
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print(f"Error detail: {str(e)}")
+        print(f"Error: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': str(e)
         }), 400
 
 if __name__ == '__main__':
-    # DeepFace might download models on first run
-    print("Starting Emotion Detection Server...")
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)
