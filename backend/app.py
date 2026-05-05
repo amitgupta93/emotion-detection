@@ -13,7 +13,11 @@ import base64
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}) # Explicitly allow all origins
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "alive"})
 
 @app.route('/')
 def index():

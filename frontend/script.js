@@ -337,11 +337,14 @@ downloadBtn.addEventListener('click', () => {
 
 // Ping backend on load to wake it up
 window.addEventListener('load', async () => {
-    console.log("Pinging backend...");
+    console.log("Pinging backend:", API_URL);
     try {
-        await fetch(API_URL);
-        console.log("Backend is awake!");
+        const res = await fetch(`${API_URL}/health`);
+        const data = await res.json();
+        if (data.status === 'alive') {
+            console.log("Backend is awake and ready!");
+        }
     } catch (err) {
-        console.log("Backend is still sleeping or URL is incorrect.");
+        console.error("Backend unreachable. Checking logs...");
     }
 });
