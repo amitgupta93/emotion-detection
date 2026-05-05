@@ -227,6 +227,44 @@ main {
     transform: translateY(-2px);
 }
 
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-header h3 {
+    margin-bottom: 0;
+}
+
+.history-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.history-controls button {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--card-border);
+}
+
+.history-controls button:hover {
+    background: rgba(255,255,255,0.2);
+    transform: none;
+}
+
+#share-btn {
+    background: #2563eb;
+    color: white;
+}
+
+#share-btn:hover:not(:disabled) {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
 h3 {
     color: var(--text-dim);
     font-size: 0.875rem;

@@ -52,7 +52,13 @@
                 </div>
 
                 <div class="history-card">
-                    <h3>Mood History</h3>
+                    <div class="card-header">
+                        <h3>Mood History</h3>
+                        <div class="history-controls">
+                            <button id="clear-history" title="Clear History">🗑️</button>
+                            <button id="download-history" title="Download History">💾</button>
+                        </div>
+                    </div>
                     <ul id="mood-history">
                         <!-- History items will be added here -->
                     </ul>
@@ -63,6 +69,7 @@
         <div class="controls">
             <button id="start-btn">Start Detection</button>
             <button id="capture-btn" disabled>Capture Snapshot</button>
+            <button id="share-btn" disabled>Share Mood</button>
             <button id="stop-btn" disabled>Stop Detection</button>
         </div>
 

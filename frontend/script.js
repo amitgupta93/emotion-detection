@@ -9,6 +9,9 @@ const moodHistory = document.getElementById('mood-history');
 const moodQuote = document.getElementById('mood-quote');
 const liveIndicator = document.getElementById('live-indicator');
 const captureBtn = document.getElementById('capture-btn');
+const shareBtn = document.getElementById('share-btn');
+const clearBtn = document.getElementById('clear-history');
+const downloadBtn = document.getElementById('download-history');
 const detectionOverlay = document.getElementById('detection-overlay');
 const scannerLine = document.getElementById('scanner-line');
 
@@ -231,6 +234,7 @@ startBtn.addEventListener('click', async () => {
         startBtn.disabled = true;
         stopBtn.disabled = false;
         captureBtn.disabled = false;
+        shareBtn.disabled = false;
         isDetecting = true;
         liveIndicator.classList.add('active');
         scannerLine.style.display = 'block';
@@ -250,6 +254,7 @@ stopBtn.addEventListener('click', () => {
     startBtn.disabled = false;
     stopBtn.disabled = true;
     captureBtn.disabled = true;
+    shareBtn.disabled = true;
     moodDisplay.innerText = "Waiting...";
     emojiDisplay.innerText = "✨";
     moodQuote.innerText = "Start detection to get an insight...";
@@ -275,4 +280,56 @@ captureBtn.addEventListener('click', () => {
     link.download = `emotion-snapshot-${Date.now()}.png`;
     link.href = canvas.toDataURL();
     link.click();
+});
+
+shareBtn.addEventListener('click', async () => {
+    const text = `Hey! My current mood is ${moodDisplay.innerText} ${emojiDisplay.innerText}. Check out this Emotion AI!`;
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'My Mood via Emotion AI',
+                text: text,
+                url: window.location.href
+            });
+        } catch (err) {
+            console.log('Error sharing:', err);
+        }
+    } else {
+        // Fallback to WhatsApp
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + window.location.href)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+});
+
+clearBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear history?')) {
+        history = [];
+        moodHistory.innerHTML = '';
+        if (moodChart) {
+            moodChart.data.labels = [];
+            moodChart.data.datasets[0].data = [];
+            moodChart.update();
+        }
+    }
+});
+
+downloadBtn.addEventListener('click', () => {
+    if (history.length === 0) return alert('No history to download!');
+    const content = history.map(item => `${item.time} - ${item.emotion}`).join('\n');
+    const blob = new Blob([content], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.download = `mood-history-${Date.now()}.txt`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+});
+
+// Ping backend on load to wake it up
+window.addEventListener('load', async () => {
+    console.log("Pinging backend...");
+    try {
+        await fetch(API_URL);
+        console.log("Backend is awake!");
+    } catch (err) {
+        console.log("Backend is still sleeping or URL is incorrect.");
+    }
 });
