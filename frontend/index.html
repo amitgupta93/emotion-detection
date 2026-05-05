@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Emotion Detector AI</h1>
+            <p>Real-time mood analysis using AI</p>
+        </header>
+
+        <main>
+            <div class="video-section">
+                <div class="video-container">
+                    <div id="live-indicator" class="live-indicator">
+                        <div class="dot"></div>
+                        <span>LIVE</span>
+                    </div>
+                    <video id="video" autoplay muted playsinline></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <div id="detection-overlay"></div>
+                    <div id="scanner-line" class="scanner-line"></div>
+                </div>
+
+                <div class="quote-card">
+                    <h3>Mood Insight</h3>
+                    <div id="mood-quote">
+                        Start detection to get an insight...
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="mood-card">
+                    <h3>Current Mood</h3>
+                    <div class="mood-container">
+                        <div id="mood-display" class="mood-value">Waiting...</div>
+                        <div id="emoji-display" class="emoji-value">✨</div>
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>Confidence Scores</h3>
+                    <div id="scores-container">
+                        <!-- Scores will be injected here -->
+                    </div>
+                </div>
+
+                <div class="history-card">
+                    <h3>Mood History</h3>
+                    <ul id="mood-history">
+                        <!-- History items will be added here -->
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <div class="controls">
+            <button id="start-btn">Start Detection</button>
+            <button id="capture-btn" disabled>Capture Snapshot</button>
+            <button id="stop-btn" disabled>Stop Detection</button>
+        </div>
+
+        <footer>
+            <p>Powered by Python Backend & JS Frontend</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
