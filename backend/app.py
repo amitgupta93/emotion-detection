@@ -6,6 +6,7 @@ import base64
 import time
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+import pandas as pd 
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
